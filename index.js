@@ -59,81 +59,22 @@ router.get('/newsdetail', async ctx => {
   }
 })
 
-router.post('/add', async ctx => {
+// 获取全部阵容列表
+router.get('/getteams', async ctx => {
   ctx.status = 200
-  let _info = ctx.request.body
-  if (!_info.name) {
-    ctx.body = {
-      errorMessage: '名称错误',
-      result: false,
-      data: null
-    }
-    return
-  }
   try {
-    let _sql = 'INSERT INTO commodity (name,number,price) VALUES (?,?,?)'
-    let _value = [_info.name, _info.number, _info.price]
-    await poolSql(_sql, _value)
+    let _sql = 'SELECT * FROM team'
+    let _data = await poolSql(_sql)
     ctx.body = {
       errorMessage: '',
       result: true,
-      data: null
+      teams: _data
     }
   } catch (error) {
     ctx.body = {
-      errorMessage: '添加失败',
+      errorMessage: '查询阵容列表失败',
       result: false,
-      data: null
-    }
-  }
-})
-
-router.post('/put', async ctx => {
-  ctx.status = 200
-  let _info = ctx.request.body
-  if (!_info.id || !_info.name) {
-    ctx.body = {
-      errorMessage: 'id或名字为空',
-      result: false,
-      data: null
-    }
-    return
-  }
-  try {
-    let _sql = 'UPDATE commodity SET name=?,number=?,price=? WHERE id=?'
-    let _value = [_info.name, _info.number, _info.price, _info.id]
-    await poolSql(_sql, _value)
-    ctx.body = {
-      errorMessage: '',
-      result: true,
-      data: null
-    }
-  } catch (error) {
-    ctx.body = {
-      errorMessage: '更新失败',
-      result: false,
-      data: null
-    }
-  }
-})
-
-router.delete('/delete/:id', async ctx => {
-  ctx.status = 200
-  let _info = ctx.params
-  try {
-    let _sql = 'DELETE FROM commodity WHERE id=?'
-    let _value = [_info.id]
-    await poolSql(_sql, _value)
-    ctx.body = {
-      errorMessage: '',
-      result: true,
-      data: null
-    }
-  } catch (error) {
-    ctx.body = {
-      errorMessage: '删除失败',
-      result: false,
-      data: null
+      news: null
     }
   }
 })
