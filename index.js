@@ -79,7 +79,7 @@ router.get('/getteams', async ctx => {
   }
 })
 
-// 根据id获取英雄信息
+// 根据id获取英雄信息 兼容多个id与一个id
 router.get('/getchessinfo', async ctx => {
   ctx.status = 200
   const _info = ctx.query
@@ -101,7 +101,7 @@ router.get('/getchessinfo', async ctx => {
   }
 })
 
-// 根据id获取羁绊信息
+// 根据id获取羁绊信息 兼容多个id与一个id
 router.get('/getraceinfo', async ctx => {
   ctx.status = 200
   const _info = ctx.query
@@ -124,7 +124,7 @@ router.get('/getraceinfo', async ctx => {
   }
 })
 
-// 根据id获取职业信息
+// 根据id获取职业信息 兼容多个id与一个id
 router.get('/getjobinfo', async ctx => {
   ctx.status = 200
   const _info = ctx.query
@@ -143,6 +143,29 @@ router.get('/getjobinfo', async ctx => {
       errorMessage: '查询职业信息失败',
       result: false,
       jobinfo: null
+    }
+  }
+})
+
+// 根据id获取装备信息 兼容多个id与一个id
+router.get('/getequipinfo', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT * FROM equipment WHERE equipId in (?,?,?,?,?,?)'
+    // 此处补0 是为了占位，防止split切开只有一个值
+    let _value = [..._info.equipId.split(','), 0, 0, 0, 0, 0]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      equipinfo: _data
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询装备信息失败',
+      result: false,
+      equipinfo: null
     }
   }
 })
