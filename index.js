@@ -79,6 +79,50 @@ router.get('/getteams', async ctx => {
   }
 })
 
+// 根据id获取英雄信息
+router.get('/getchessinfo', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT * FROM chess WHERE chessId=?'
+    let _value = [_info.chessId]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      chessinfo: _data
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询英雄信息失败',
+      result: false,
+      chessinfo: null
+    }
+  }
+})
+
+// 根据id获取英雄信息
+router.get('/getraceinfo', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT * FROM race WHERE raceId=?'
+    let _value = [_info.raceId]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      raceId: _data
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询羁绊信息失败',
+      result: false,
+      raceId: null
+    }
+  }
+})
+
 //监听端口
 app.listen(5000, () => {
   console.log('服务启动，监听5000端口')
