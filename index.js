@@ -101,7 +101,7 @@ router.get('/getchessinfo', async ctx => {
   }
 })
 
-// 根据id获取英雄信息
+// 根据id获取羁绊信息
 router.get('/getraceinfo', async ctx => {
   ctx.status = 200
   const _info = ctx.query
