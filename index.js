@@ -106,19 +106,43 @@ router.get('/getraceinfo', async ctx => {
   ctx.status = 200
   const _info = ctx.query
   try {
-    let _sql = 'SELECT * FROM race WHERE raceId=?'
-    let _value = [_info.raceId]
+    let _sql = 'SELECT * FROM race WHERE raceId in (?,?)'
+    // 此处补0 是为了占位，防止split切开只有一个值
+    let _value = [..._info.raceId.split(','), 0]
     let _data = await poolSql(_sql, _value)
     ctx.body = {
       errorMessage: '',
       result: true,
-      raceId: _data
+      raceinfo: _data
     }
   } catch (error) {
     ctx.body = {
       errorMessage: '查询羁绊信息失败',
       result: false,
-      raceId: null
+      raceinfo: null
+    }
+  }
+})
+
+// 根据id获取职业信息
+router.get('/getjobinfo', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT * FROM jobs WHERE jobId in (?,?)'
+    // 此处补0 是为了占位，防止split切开只有一个值
+    let _value = [..._info.jobId.split(','), 0]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      jobinfo: _data
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询职业信息失败',
+      result: false,
+      jobinfo: null
     }
   }
 })
