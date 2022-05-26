@@ -170,6 +170,33 @@ router.get('/getequipinfo', async ctx => {
   }
 })
 
+// 查询协同英雄信息
+router.get('/getsimilar', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    // 使用模糊查询匹配关键词 之所以不用id匹配是因为在此处匹配1会匹配到11,且文本匹配可以起到同样效果
+    let _sql_race = 'SELECT * FROM chess WHERE races LIKE CONCAT("%",?,"%") OR races LIKE CONCAT("%",?,"%")'
+    let _sql_job = 'SELECT * FROM chess WHERE jobs LIKE CONCAT("%",?,"%") OR jobs LIKE CONCAT("%",?,"%")'
+    // 此处补0 是为了占位，防止split切开只有一个值
+    let _value_race = [..._info.races.split(','), 0] //获取race参数
+    let _value_job = [..._info.jobs.split(','), 0] // 获取job参数
+    let _data_job = await poolSql(_sql_job, _value_job)
+    let _data_race = await poolSql(_sql_race, _value_race)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      similarinfo: [..._data_job, ..._data_race] //展开合并为一个数组
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询协同英雄信息失败',
+      result: false,
+      similarinfo: null
+    }
+  }
+})
+
 //监听端口
 app.listen(5000, () => {
   console.log('服务启动，监听5000端口')
