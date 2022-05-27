@@ -79,13 +79,35 @@ router.get('/getteams', async ctx => {
   }
 })
 
+// 根据id获取阵容详情
+router.get('/getteambyid', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT * FROM team WHERE teamId=?'
+    let _value = [_info.teamId]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      teaminfo: _data
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询阵容信息失败',
+      result: false,
+      teaminfo: null
+    }
+  }
+})
+
 // 根据id获取英雄信息 兼容多个id与一个id
 router.get('/getchessinfo', async ctx => {
   ctx.status = 200
   const _info = ctx.query
   try {
-    let _sql = 'SELECT * FROM chess WHERE chessId=?'
-    let _value = [_info.chessId]
+    let _sql = 'SELECT * FROM chess WHERE chessId in (?,?,?,?,?,?,?,?,?)'
+    let _value = [..._info.chessId.split(','), 0, 0, 0, 0, 0, 0, 0, 0]
     let _data = await poolSql(_sql, _value)
     ctx.body = {
       errorMessage: '',
