@@ -176,17 +176,21 @@ router.get('/getsimilar', async ctx => {
   const _info = ctx.query
   try {
     // 使用模糊查询匹配关键词 之所以不用id匹配是因为在此处匹配1会匹配到11,且文本匹配可以起到同样效果
+    // 但是会导致在查询出同样的两个本英雄信息 需要前端传递id过来再进行filter
     let _sql_race = 'SELECT * FROM chess WHERE races LIKE CONCAT("%",?,"%") OR races LIKE CONCAT("%",?,"%")'
     let _sql_job = 'SELECT * FROM chess WHERE jobs LIKE CONCAT("%",?,"%") OR jobs LIKE CONCAT("%",?,"%")'
     // 此处补0 是为了占位，防止split切开只有一个值
     let _value_race = [..._info.races.split(','), 0] //获取race参数
     let _value_job = [..._info.jobs.split(','), 0] // 获取job参数
+    let _value_id = _info.id //获取id用于过筛
     let _data_job = await poolSql(_sql_job, _value_job)
     let _data_race = await poolSql(_sql_race, _value_race)
+    // 这里比较奇怪 !== 不能匹配到数据
+    const result = [..._data_job, ..._data_race].filter(item => item.chessId != _value_id)
     ctx.body = {
       errorMessage: '',
       result: true,
-      similarinfo: [..._data_job, ..._data_race] //展开合并为一个数组
+      similarinfo: result //展开合并为一个数组
     }
   } catch (error) {
     ctx.body = {
