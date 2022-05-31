@@ -128,9 +128,9 @@ router.get('/getraceinfo', async ctx => {
   ctx.status = 200
   const _info = ctx.query
   try {
-    let _sql = 'SELECT * FROM race WHERE raceId in (?,?)'
+    let _sql = 'SELECT * FROM race WHERE raceId in (?,?,?,?,?,?,?,?)'
     // 此处补0 是为了占位，防止split切开只有一个值
-    let _value = [..._info.raceId.split(','), 0]
+    let _value = [..._info.raceId.split(','), 0, 0, 0, 0, 0, 0, 0]
     let _data = await poolSql(_sql, _value)
     ctx.body = {
       errorMessage: '',
@@ -151,9 +151,9 @@ router.get('/getjobinfo', async ctx => {
   ctx.status = 200
   const _info = ctx.query
   try {
-    let _sql = 'SELECT * FROM jobs WHERE jobId in (?,?)'
+    let _sql = 'SELECT * FROM jobs WHERE jobId in (?,?,?,?,?,?,?,?)'
     // 此处补0 是为了占位，防止split切开只有一个值
-    let _value = [..._info.jobId.split(','), 0]
+    let _value = [..._info.jobId.split(','), 0, 0, 0, 0, 0, 0, 0]
     let _data = await poolSql(_sql, _value)
     ctx.body = {
       errorMessage: '',
