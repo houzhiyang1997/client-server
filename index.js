@@ -192,6 +192,29 @@ router.get('/getequipinfo', async ctx => {
   }
 })
 
+// 根据id获取hex信息 兼容多个id与一个id
+router.get('/gethexinfo', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT * FROM hex WHERE hexId in (?,?,?,?,?,?)'
+    // 此处补0 是为了占位，防止split切开只有一个值
+    let _value = [..._info.hexId.split(','), 0, 0, 0, 0, 0]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      hexinfo: _data
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询hex信息失败',
+      result: false,
+      hexinfo: null
+    }
+  }
+})
+
 // 查询协同英雄信息
 router.get('/getsimilar', async ctx => {
   ctx.status = 200
