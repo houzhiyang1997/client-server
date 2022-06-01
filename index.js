@@ -178,16 +178,24 @@ router.get('/getequipinfo', async ctx => {
     // 此处补0 是为了占位，防止split切开只有一个值
     let _value = [..._info.equipId.split(','), 0, 0, 0, 0, 0]
     let _data = await poolSql(_sql, _value)
+    // 不能用foreach 因为foreach是同步的
+    // 但是使用let 或者闭包的原理可以实现
+    let _formula = []
+    for (let i = 0; i < _data.length; i++) {
+      _formula.push(await poolSql(_sql, [..._data[i].formula.split(','), 0, 0, 0, 0, 0]))
+    }
+
     ctx.body = {
       errorMessage: '',
       result: true,
-      equipinfo: _data
+      equipinfo: _data,
+      formula: _formula
     }
   } catch (error) {
     ctx.body = {
       errorMessage: '查询装备信息失败',
       result: false,
-      equipinfo: null
+      equipinfo: error
     }
   }
 })
