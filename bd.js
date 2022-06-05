@@ -4,7 +4,7 @@ const poolSql = mysql.createPool({
   host: '106.12.140.161',
   port: '3306',
   user: 'root',
-  password: '123456',
+  password: 'hzy1997-baidu',
   database: 'cloud_chess'
 })
 

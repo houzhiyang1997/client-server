@@ -101,6 +101,26 @@ router.get('/getteambyid', async ctx => {
   }
 })
 
+// 获取全部英雄列表
+router.get('/getallchess', async ctx => {
+  ctx.status = 200
+  try {
+    let _sql = 'SELECT * FROM chess'
+    let _data = await poolSql(_sql)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      allChess: _data
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询所有英雄失败',
+      result: false,
+      allChess: null
+    }
+  }
+})
+
 // 根据id获取英雄信息 兼容多个id与一个id
 router.get('/getchessinfo', async ctx => {
   ctx.status = 200
