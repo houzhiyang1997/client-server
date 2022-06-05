@@ -143,6 +143,26 @@ router.get('/getchessinfo', async ctx => {
   }
 })
 
+// 获取全部羁绊列表
+router.get('/getallrace', async ctx => {
+  ctx.status = 200
+  try {
+    let _sql = 'SELECT * FROM race'
+    let _data = await poolSql(_sql)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      allRace: _data
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询所有羁绊失败',
+      result: false,
+      allRace: null
+    }
+  }
+})
+
 // 根据id获取羁绊信息 兼容多个id与一个id
 router.get('/getraceinfo', async ctx => {
   ctx.status = 200
@@ -162,6 +182,26 @@ router.get('/getraceinfo', async ctx => {
       errorMessage: '查询羁绊信息失败',
       result: false,
       raceinfo: null
+    }
+  }
+})
+
+// 获取全部职业列表
+router.get('/getalljob', async ctx => {
+  ctx.status = 200
+  try {
+    let _sql = 'SELECT * FROM jobs'
+    let _data = await poolSql(_sql)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      allJob: _data
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询所有职业失败',
+      result: false,
+      allJob: null
     }
   }
 })
