@@ -229,6 +229,27 @@ router.get('/getjobinfo', async ctx => {
   }
 })
 
+// 获取全部装备列表(因为装备更新较快，取值为一个区间)
+router.get('/getallequip', async ctx => {
+  ctx.status = 200
+  try {
+    let _sql =
+      'SELECT * FROM equipment WHERE (equipId>=501 and equipId<=509) or (equipId>=412 and equipId<=421) or (equipId>=519 and equipId<=531) or (equipId>=535 and equipId<=548) or (equipId>=551 and equipId<=562) or (equipId>=565 and equipId<=573) or (equipId>=577 and equipId<=584) or (equipId>=587 and equipId<=592) or (equipId>=6001 and equipId<=6025)'
+    let _data = await poolSql(_sql)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      allEquip: _data
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询所有装备失败',
+      result: false,
+      allEquip: null
+    }
+  }
+})
+
 // 根据id获取装备信息 兼容多个id与一个id
 router.get('/getequipinfo', async ctx => {
   ctx.status = 200
