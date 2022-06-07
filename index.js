@@ -375,6 +375,39 @@ router.get('/getallhero', async ctx => {
   }
 })
 
+// 登录接口
+router.post('/login', async ctx => {
+  let _info = ctx.request.body
+  try {
+    let _sql = 'SELECT * FROM user where username=?'
+    let _username = [_info.username]
+    let _data = await poolSql(_sql, _username)
+    if (_info.password === _data[0].password) {
+      ctx.status = 200
+      ctx.body = {
+        errorMessage: '',
+        result: true,
+        data: _data
+      }
+    } else {
+      ctx.status = 401
+      ctx.body = {
+        errorMessage: '用户名或密码错误',
+        result: false,
+        data: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.status = 402
+    ctx.body = {
+      errorMessage: '登录失败',
+      result: false,
+      data: null
+    }
+  }
+})
+
 //监听端口
 app.listen(5000, () => {
   console.log('服务启动，监听5000端口')
