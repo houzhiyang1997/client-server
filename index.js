@@ -377,21 +377,23 @@ router.get('/getallhero', async ctx => {
 
 // 登录接口
 router.post('/login', async ctx => {
+  ctx.status = 200
   let _info = ctx.request.body
   try {
     let _sql = 'SELECT * FROM user where username=?'
     let _username = [_info.username]
     let _data = await poolSql(_sql, _username)
     if (_info.password === _data[0].password) {
-      ctx.status = 200
       ctx.body = {
+        code: 200,
         errorMessage: '',
         result: true,
-        data: _data
+        data: _data[0],
+        token: Date.now()
       }
     } else {
-      ctx.status = 401
       ctx.body = {
+        code: 401,
         errorMessage: '用户名或密码错误',
         result: false,
         data: null
@@ -399,8 +401,8 @@ router.post('/login', async ctx => {
       return
     }
   } catch (error) {
-    ctx.status = 402
     ctx.body = {
+      code: 402,
       errorMessage: '登录失败',
       result: false,
       data: null
