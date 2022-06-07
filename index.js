@@ -355,6 +355,26 @@ router.get('/getsimilar', async ctx => {
   }
 })
 
+// 获取全部小小英雄列表
+router.get('/getallhero', async ctx => {
+  ctx.status = 200
+  try {
+    let _sql = 'SELECT * FROM hero order by miniId'
+    let _data = await poolSql(_sql)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      allHero: _data
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询所有小小英雄失败',
+      result: false,
+      allHero: null
+    }
+  }
+})
+
 //监听端口
 app.listen(5000, () => {
   console.log('服务启动，监听5000端口')
