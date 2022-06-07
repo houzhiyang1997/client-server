@@ -281,6 +281,26 @@ router.get('/getequipinfo', async ctx => {
   }
 })
 
+// 获取全部hex列表
+router.get('/getallhex', async ctx => {
+  ctx.status = 200
+  try {
+    let _sql = 'SELECT * FROM hex'
+    let _data = await poolSql(_sql)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      allHex: _data
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询所有海克斯失败',
+      result: false,
+      allHex: null
+    }
+  }
+})
+
 // 根据id获取hex信息 兼容多个id与一个id
 router.get('/gethexinfo', async ctx => {
   ctx.status = 200
