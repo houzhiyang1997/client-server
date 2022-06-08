@@ -410,6 +410,29 @@ router.post('/login', async ctx => {
   }
 })
 
+// 根据id获取用户信息
+router.get('/getuserinfo', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT * FROM user WHERE id=?'
+    // 此处补0 是为了占位，防止split切开只有一个值
+    let _value = [_info.id]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      userInfo: _data
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询user信息失败',
+      result: false,
+      userInfo: null
+    }
+  }
+})
+
 //监听端口
 app.listen(5000, () => {
   console.log('服务启动，监听5000端口')
