@@ -5,7 +5,7 @@ const poolSql = mysql.createPool({
   port: '3306',
   user: 'root',
   password: 'hzy1997-baidu',
-  database: 'cloud_chess'
+  database: 'cloud_chess67'
 })
 
 function query(sql, value) {

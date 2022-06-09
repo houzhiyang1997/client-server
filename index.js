@@ -62,9 +62,11 @@ router.get('/newsdetail', async ctx => {
 // 获取全部阵容列表
 router.get('/getteams', async ctx => {
   ctx.status = 200
+  const _info = ctx.query
   try {
-    let _sql = 'SELECT * FROM team'
-    let _data = await poolSql(_sql)
+    let _sql = 'SELECT * FROM team WHERE version=?'
+    let _value = [_info.version]
+    let _data = await poolSql(_sql, _value)
     ctx.body = {
       errorMessage: '',
       result: true,
@@ -84,8 +86,8 @@ router.get('/getteambyid', async ctx => {
   ctx.status = 200
   const _info = ctx.query
   try {
-    let _sql = 'SELECT * FROM team WHERE teamId=?'
-    let _value = [_info.teamId]
+    let _sql = 'SELECT * FROM team WHERE teamId=? and version=?'
+    let _value = [_info.teamId, _info.version]
     let _data = await poolSql(_sql, _value)
     ctx.body = {
       errorMessage: '',
@@ -104,9 +106,11 @@ router.get('/getteambyid', async ctx => {
 // 获取全部英雄列表
 router.get('/getallchess', async ctx => {
   ctx.status = 200
+  const _info = ctx.query
   try {
-    let _sql = 'SELECT * FROM chess'
-    let _data = await poolSql(_sql)
+    let _sql = 'SELECT * FROM chess WHERE version=?'
+    let _value = [_info.version]
+    let _data = await poolSql(_sql, _value)
     ctx.body = {
       errorMessage: '',
       result: true,
@@ -126,8 +130,8 @@ router.get('/getchessinfo', async ctx => {
   ctx.status = 200
   const _info = ctx.query
   try {
-    let _sql = 'SELECT * FROM chess WHERE chessId in (?,?,?,?,?,?,?,?,?)'
-    let _value = [..._info.chessId.split(','), 0, 0, 0, 0, 0, 0, 0, 0]
+    let _sql = 'SELECT * FROM chess WHERE version=? and chessId in (?,?,?,?,?,?,?,?,?)'
+    let _value = [_info.version, ..._info.chessId.split(','), 0, 0, 0, 0, 0, 0, 0, 0]
     let _data = await poolSql(_sql, _value)
     ctx.body = {
       errorMessage: '',
@@ -146,9 +150,11 @@ router.get('/getchessinfo', async ctx => {
 // 获取全部羁绊列表
 router.get('/getallrace', async ctx => {
   ctx.status = 200
+  const _info = ctx.query
   try {
-    let _sql = 'SELECT * FROM race'
-    let _data = await poolSql(_sql)
+    let _sql = 'SELECT * FROM race WHERE version=?'
+    let _value = [_info.version]
+    let _data = await poolSql(_sql, _value)
     ctx.body = {
       errorMessage: '',
       result: true,
@@ -168,9 +174,9 @@ router.get('/getraceinfo', async ctx => {
   ctx.status = 200
   const _info = ctx.query
   try {
-    let _sql = 'SELECT * FROM race WHERE raceId in (?,?,?,?,?,?,?,?)'
+    let _sql = 'SELECT * FROM race WHERE version=? and raceId in (?,?,?,?,?,?,?,?)'
     // 此处补0 是为了占位，防止split切开只有一个值
-    let _value = [..._info.raceId.split(','), 0, 0, 0, 0, 0, 0, 0]
+    let _value = [_info.version, ..._info.raceId.split(','), 0, 0, 0, 0, 0, 0, 0]
     let _data = await poolSql(_sql, _value)
     ctx.body = {
       errorMessage: '',
@@ -189,9 +195,11 @@ router.get('/getraceinfo', async ctx => {
 // 获取全部职业列表
 router.get('/getalljob', async ctx => {
   ctx.status = 200
+  const _info = ctx.query
   try {
-    let _sql = 'SELECT * FROM jobs'
-    let _data = await poolSql(_sql)
+    let _sql = 'SELECT * FROM jobs WHERE version=?'
+    let _value = [_info.version]
+    let _data = await poolSql(_sql, _value)
     ctx.body = {
       errorMessage: '',
       result: true,
@@ -211,9 +219,9 @@ router.get('/getjobinfo', async ctx => {
   ctx.status = 200
   const _info = ctx.query
   try {
-    let _sql = 'SELECT * FROM jobs WHERE jobId in (?,?,?,?,?,?,?,?)'
+    let _sql = 'SELECT * FROM jobs WHERE version=? and jobId in (?,?,?,?,?,?,?,?)'
     // 此处补0 是为了占位，防止split切开只有一个值
-    let _value = [..._info.jobId.split(','), 0, 0, 0, 0, 0, 0, 0]
+    let _value = [_info.version, ..._info.jobId.split(','), 0, 0, 0, 0, 0, 0, 0]
     let _data = await poolSql(_sql, _value)
     ctx.body = {
       errorMessage: '',
@@ -232,10 +240,12 @@ router.get('/getjobinfo', async ctx => {
 // 获取全部装备列表(因为装备更新较快，取值为一个区间)
 router.get('/getallequip', async ctx => {
   ctx.status = 200
+  const _info = ctx.query
   try {
     let _sql =
-      'SELECT * FROM equipment WHERE (equipId>=501 and equipId<=509) or (equipId>=412 and equipId<=421) or (equipId>=519 and equipId<=531) or (equipId>=535 and equipId<=548) or (equipId>=551 and equipId<=562) or (equipId>=565 and equipId<=573) or (equipId>=577 and equipId<=584) or (equipId>=587 and equipId<=592) or (equipId>=6001 and equipId<=6025)'
-    let _data = await poolSql(_sql)
+      'SELECT * FROM equipment WHERE version=? and ((equipId>=501 and equipId<=509) or (equipId>=412 and equipId<=421) or (equipId>=519 and equipId<=531) or (equipId>=535 and equipId<=548) or (equipId>=551 and equipId<=562) or (equipId>=565 and equipId<=573) or (equipId>=577 and equipId<=584) or (equipId>=587 and equipId<=592) or (equipId>=6001 and equipId<=6025))'
+    let _value = [_info.version]
+    let _data = await poolSql(_sql, _value)
     ctx.body = {
       errorMessage: '',
       result: true,
@@ -255,15 +265,15 @@ router.get('/getequipinfo', async ctx => {
   ctx.status = 200
   const _info = ctx.query
   try {
-    let _sql = 'SELECT * FROM equipment WHERE equipId in (?,?,?,?,?,?)'
+    let _sql = 'SELECT * FROM equipment WHERE version=? and equipId in (?,?,?,?,?,?)'
     // 此处补0 是为了占位，防止split切开只有一个值
-    let _value = [..._info.equipId.split(','), 0, 0, 0, 0, 0]
+    let _value = [_info.version, ..._info.equipId.split(','), 0, 0, 0, 0, 0]
     let _data = await poolSql(_sql, _value)
     // 不能用foreach 因为foreach是同步的
     // 但是使用let 或者闭包的原理可以实现
     let _formula = []
     for (let i = 0; i < _data.length; i++) {
-      _formula.push(await poolSql(_sql, [..._data[i].formula.split(','), 0, 0, 0, 0, 0]))
+      _formula.push(await poolSql(_sql, [_info.version, ..._data[i].formula.split(','), 0, 0, 0, 0, 0]))
     }
 
     ctx.body = {
@@ -284,9 +294,11 @@ router.get('/getequipinfo', async ctx => {
 // 获取全部hex列表
 router.get('/getallhex', async ctx => {
   ctx.status = 200
+  const _info = ctx.query
   try {
-    let _sql = 'SELECT * FROM hex'
-    let _data = await poolSql(_sql)
+    let _sql = 'SELECT * FROM hex WHERE version=?'
+    let _value = [_info.version]
+    let _data = await poolSql(_sql, _value)
     ctx.body = {
       errorMessage: '',
       result: true,
@@ -306,9 +318,9 @@ router.get('/gethexinfo', async ctx => {
   ctx.status = 200
   const _info = ctx.query
   try {
-    let _sql = 'SELECT * FROM hex WHERE hexId in (?,?,?,?,?,?)'
+    let _sql = 'SELECT * FROM hex WHERE version=? and hexId in (?,?,?,?,?,?)'
     // 此处补0 是为了占位，防止split切开只有一个值
-    let _value = [..._info.hexId.split(','), 0, 0, 0, 0, 0]
+    let _value = [_info.version, ..._info.hexId.split(','), 0, 0, 0, 0, 0]
     let _data = await poolSql(_sql, _value)
     ctx.body = {
       errorMessage: '',
@@ -331,11 +343,13 @@ router.get('/getsimilar', async ctx => {
   try {
     // 使用模糊查询匹配关键词 之所以不用id匹配是因为在此处匹配1会匹配到11,且文本匹配可以起到同样效果
     // 但是会导致在查询出同样的两个本英雄信息 需要前端传递id过来再进行filter
-    let _sql_race = 'SELECT * FROM chess WHERE races LIKE CONCAT("%",?,"%") OR races LIKE CONCAT("%",?,"%")'
-    let _sql_job = 'SELECT * FROM chess WHERE jobs LIKE CONCAT("%",?,"%") OR jobs LIKE CONCAT("%",?,"%")'
+    let _sql_race =
+      'SELECT * FROM chess WHERE version=? and (races LIKE CONCAT("%",?,"%") OR races LIKE CONCAT("%",?,"%"))'
+    let _sql_job =
+      'SELECT * FROM chess WHERE version=? and (jobs LIKE CONCAT("%",?,"%") OR jobs LIKE CONCAT("%",?,"%"))'
     // 此处补0 是为了占位，防止split切开只有一个值
-    let _value_race = [..._info.races.split(','), 0] //获取race参数
-    let _value_job = [..._info.jobs.split(','), 0] // 获取job参数
+    let _value_race = [_info.version, ..._info.races.split(','), 0] //获取race参数
+    let _value_job = [_info.version, ..._info.jobs.split(','), 0] // 获取job参数
     let _value_id = _info.id //获取id用于过筛
     let _data_job = await poolSql(_sql_job, _value_job)
     let _data_race = await poolSql(_sql_race, _value_race)
@@ -416,7 +430,6 @@ router.get('/getuserinfo', async ctx => {
   const _info = ctx.query
   try {
     let _sql = 'SELECT * FROM user WHERE id=?'
-    // 此处补0 是为了占位，防止split切开只有一个值
     let _value = [_info.id]
     let _data = await poolSql(_sql, _value)
     ctx.body = {
