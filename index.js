@@ -5,6 +5,7 @@ const Router = require('koa-router')
 const poolSql = require('./bd.js')
 const cors = require('koa2-cors') //跨域
 const bodyParser = require('koa-bodyparser') // 处理post put参数
+
 // 实例化
 const app = new Koa()
 const router = new Router()
@@ -15,6 +16,25 @@ app.use(cors()).use(bodyParser()).use(router.routes()).use(router.allowedMethods
 router.get('/index', async ctx => {
   ctx.status = 200
   ctx.body = '这是index'
+})
+
+router.get('/admin/getusers', async ctx => {
+  ctx.status = 200
+  try {
+    let _sql = 'SELECT * FROM user_view'
+    let _data = await poolSql(_sql)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      users: _data
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询用户列表失败',
+      result: false,
+      users: null
+    }
+  }
 })
 
 // 获取全部新闻列表
@@ -64,7 +84,7 @@ router.get('/getteams', async ctx => {
   ctx.status = 200
   const _info = ctx.query
   try {
-    let _sql = 'SELECT * FROM team WHERE version=?'
+    let _sql = 'SELECT * FROM team WHERE version=? order by goods DESC'
     let _value = [_info.version]
     let _data = await poolSql(_sql, _value)
     ctx.body = {
@@ -244,6 +264,10 @@ router.get('/getallequip', async ctx => {
   try {
     let _sql =
       'SELECT * FROM equipment WHERE version=? and ((equipId>=501 and equipId<=509) or (equipId>=412 and equipId<=421) or (equipId>=519 and equipId<=531) or (equipId>=535 and equipId<=548) or (equipId>=551 and equipId<=562) or (equipId>=565 and equipId<=573) or (equipId>=577 and equipId<=584) or (equipId>=587 and equipId<=592) or (equipId>=6001 and equipId<=6025))'
+    if (_info.version === '12.11') {
+      _sql =
+        'SELECT * FROM equipment WHERE version=? and ((equipId>=501 and equipId<=509) or (equipId>=412 and equipId<=421) or (equipId>=519 and equipId<=531) or (equipId>=535 and equipId<=548) or (equipId>=551 and equipId<=562) or (equipId>=565 and equipId<=573) or (equipId>=577 and equipId<=584) or (equipId>=587 and equipId<=592) or (equipId>=7001 and equipId<=7033)) order by equipId DESC'
+    }
     let _value = [_info.version]
     let _data = await poolSql(_sql, _value)
     ctx.body = {
