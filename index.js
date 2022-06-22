@@ -49,6 +49,98 @@ router.get('/admin/getusers', async ctx => {
   }
 })
 
+// 根据id获取用户信息
+router.get('/admin/getuserbyid', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT * FROM user WHERE id=?'
+    let _value = [_info.id]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      user: _data[0]
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询用户详情失败',
+      result: false,
+      user: null
+    }
+  }
+})
+
+// 添加用户
+router.post('/admin/adduser', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    let _sql = 'INSERT INTO user (username,password,nickName,level,exp,score,imgUrl) VALUES (?,?,?,?,?,?,?)'
+    let _value = [_info.username, _info.password, _info.nickName, _info.level, _info.exp, _info.score, _info.imgUrl]
+    console.log(_value)
+    let _data = await poolSql(_sql, _value)
+    console.log(_data)
+    if (_data.affectedRows === 1) {
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        count: _data.affectedRows
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '添加失败',
+        result: false,
+        count: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '添加失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
+// 根据id修改用户信息
+router.post('/admin/edituser', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    let _sql = 'UPDATE user SET nickName=?,level=?,exp=?,score=?,imgUrl=? WHERE id=?'
+    let _value = [_info.nickName, _info.level, _info.exp, _info.score, _info.imgUrl, _info.id]
+    let _data = await poolSql(_sql, _value)
+    if (_data.affectedRows === 1) {
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        count: _data.affectedRows
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '修改用户信息失败',
+        result: false,
+        count: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '修改用户信息失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
 // 获取全部新闻列表
 router.get('/getnews', async ctx => {
   ctx.status = 200
