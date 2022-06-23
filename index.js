@@ -84,6 +84,68 @@ router.get('/admin/getadmins', async ctx => {
   }
 })
 
+// 获取chess列表，带分页
+router.get('/admin/getchesses', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    //先查询总数
+    let _sql_total =
+      'SELECT count(id) as total FROM chess WHERE season=? AND (title LIKE CONCAT("%",?,"%") OR displayName LIKE CONCAT("%",?,"%"))'
+    let _total = await poolSql(_sql_total, [_info.selectContent, _info.searchContent, _info.searchContent])
+    // 分页查询 注意需要两个数字类型
+    let offset = (Number(_info.pageNum) - 1) * Number(_info.pageSize)
+    let _value = [_info.selectContent, _info.searchContent, _info.searchContent, Number(_info.pageSize), offset]
+    let _sql_data =
+      'SELECT * FROM chess WHERE season=? AND (title LIKE CONCAT("%",?,"%") OR displayName LIKE CONCAT("%",?,"%")) limit ? offset ?'
+    let _data = await poolSql(_sql_data, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      chesses: _data,
+      total: _total[0].total
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询英雄棋子列表失败',
+      result: false,
+      chesses: null,
+      total: null
+    }
+  }
+})
+
+// 获取race列表，带分页
+router.get('/admin/getraces', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    //先查询总数
+    let _sql_total =
+      'SELECT count(id) as total FROM race WHERE season=? AND (name LIKE CONCAT("%",?,"%") OR introduce LIKE CONCAT("%",?,"%"))'
+    let _total = await poolSql(_sql_total, [_info.selectContent, _info.searchContent, _info.searchContent])
+    // 分页查询 注意需要两个数字类型
+    let offset = (Number(_info.pageNum) - 1) * Number(_info.pageSize)
+    let _value = [_info.selectContent, _info.searchContent, _info.searchContent, Number(_info.pageSize), offset]
+    let _sql_data =
+      'SELECT * FROM race WHERE season=? AND (name LIKE CONCAT("%",?,"%") OR introduce LIKE CONCAT("%",?,"%")) limit ? offset ?'
+    let _data = await poolSql(_sql_data, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      races: _data,
+      total: _total[0].total
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询羁绊列表失败',
+      result: false,
+      races: null,
+      total: null
+    }
+  }
+})
+
 // 添加用户
 router.post('/admin/adduser', async ctx => {
   ctx.status = 200
@@ -313,6 +375,13 @@ router.get('/admin/deleteadmin', async ctx => {
   }
 })
 
+/* 
+
+
+----------------------------------------client
+
+
+*/
 // 获取全部新闻列表
 router.get('/getnews', async ctx => {
   ctx.status = 200
