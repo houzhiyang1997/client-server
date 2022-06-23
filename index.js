@@ -201,40 +201,6 @@ router.get('/admin/getadminbyid', async ctx => {
   }
 })
 
-// 根据id 修改管理员信息
-router.post('/admin/editadmin', async ctx => {
-  ctx.status = 200
-  let _info = ctx.request.body
-  try {
-    let _sql = 'UPDATE admin SET password=?,nickName=?,regDate=?,imgUrl=? WHERE id=?'
-    let _value = [_info.password, _info.nickName, _info.regDate, _info.imgUrl, _info.id]
-    let _data = await poolSql(_sql, _value)
-    if (_data.affectedRows === 1) {
-      ctx.body = {
-        code: 200,
-        errorMessage: '',
-        result: true,
-        count: _data.affectedRows
-      }
-    } else {
-      ctx.body = {
-        code: 401,
-        errorMessage: '修改管理员信息失败',
-        result: false,
-        count: null
-      }
-      return
-    }
-  } catch (error) {
-    ctx.body = {
-      code: 402,
-      errorMessage: '修改管理员信息失败',
-      result: false,
-      count: null
-    }
-  }
-})
-
 // 根据id 修改用户信息
 router.post('/admin/edituser', async ctx => {
   ctx.status = 200
@@ -269,6 +235,40 @@ router.post('/admin/edituser', async ctx => {
   }
 })
 
+// 根据id 修改管理员信息
+router.post('/admin/editadmin', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    let _sql = 'UPDATE admin SET password=?,nickName=?,regDate=?,imgUrl=? WHERE id=?'
+    let _value = [_info.password, _info.nickName, _info.regDate, _info.imgUrl, _info.id]
+    let _data = await poolSql(_sql, _value)
+    if (_data.affectedRows === 1) {
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        count: _data.affectedRows
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '修改管理员信息失败',
+        result: false,
+        count: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '修改管理员信息失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
 // 根据id删除用户信息
 router.get('/admin/deleteuser', async ctx => {
   ctx.status = 200
@@ -285,6 +285,28 @@ router.get('/admin/deleteuser', async ctx => {
   } catch (error) {
     ctx.body = {
       errorMessage: '删除用户详情失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
+// 根据id删除管理员信息
+router.get('/admin/deleteadmin', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'DELETE FROM admin WHERE id=?'
+    let _value = [_info.id]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      count: _data.affectedRows
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '删除管理员详情失败',
       result: false,
       count: null
     }
