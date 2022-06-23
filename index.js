@@ -177,6 +177,37 @@ router.get('/admin/getjobs', async ctx => {
   }
 })
 
+// 获取equip列表，带分页
+router.get('/admin/getequips', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    //先查询总数
+    let _sql_total =
+      'SELECT count(id) as total FROM equipment WHERE season=? AND (name LIKE CONCAT("%",?,"%") OR effect LIKE CONCAT("%",?,"%"))'
+    let _total = await poolSql(_sql_total, [_info.selectContent, _info.searchContent, _info.searchContent])
+    // 分页查询 注意需要两个数字类型
+    let offset = (Number(_info.pageNum) - 1) * Number(_info.pageSize)
+    let _value = [_info.selectContent, _info.searchContent, _info.searchContent, Number(_info.pageSize), offset]
+    let _sql_data =
+      'SELECT * FROM equipment WHERE season=? AND (name LIKE CONCAT("%",?,"%") OR effect LIKE CONCAT("%",?,"%")) limit ? offset ?'
+    let _data = await poolSql(_sql_data, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      equips: _data,
+      total: _total[0].total
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询装备列表失败',
+      result: false,
+      equips: null,
+      total: null
+    }
+  }
+})
+
 // 添加用户
 router.post('/admin/adduser', async ctx => {
   ctx.status = 200
