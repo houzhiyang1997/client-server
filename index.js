@@ -49,24 +49,37 @@ router.get('/admin/getusers', async ctx => {
   }
 })
 
-// 根据id获取用户信息
-router.get('/admin/getuserbyid', async ctx => {
+// 获取admin列表，带分页
+router.get('/admin/getadmins', async ctx => {
   ctx.status = 200
   const _info = ctx.query
   try {
-    let _sql = 'SELECT * FROM user WHERE id=?'
-    let _value = [_info.id]
-    let _data = await poolSql(_sql, _value)
+    //先查询总数
+    let _sql_total =
+      'SELECT count(id) as total FROM admin_view WHERE (admin LIKE CONCAT("%",?,"%") OR nickName LIKE CONCAT("%",?,"%"))'
+    let _total = await poolSql(_sql_total, [_info.searchContent, _info.searchContent])
+    // 分页查询 注意需要两个数字类型
+    let offset = (Number(_info.pageNum) - 1) * Number(_info.pageSize)
+    let _value = [_info.searchContent, _info.searchContent, Number(_info.pageSize), offset]
+    let _sql_data =
+      'SELECT * FROM admin_view WHERE (admin LIKE CONCAT("%",?,"%") OR nickName LIKE CONCAT("%",?,"%")) limit ? offset ?'
+    let _data = await poolSql(_sql_data, _value)
+    //将管理员级别进行映射处理
+    _data.forEach(item => {
+      item.level = item.level === 1 ? '超级管理员' : '次级管理员'
+    })
     ctx.body = {
       errorMessage: '',
       result: true,
-      user: _data[0]
+      admins: _data,
+      total: _total[0].total
     }
   } catch (error) {
     ctx.body = {
-      errorMessage: '查询用户详情失败',
+      errorMessage: '查询管理员列表失败',
       result: false,
-      user: null
+      admins: null,
+      total: null
     }
   }
 })
@@ -81,6 +94,41 @@ router.post('/admin/adduser', async ctx => {
     console.log(_value)
     let _data = await poolSql(_sql, _value)
     console.log(_data)
+    if (_data.affectedRows === 1) {
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        count: _data.affectedRows
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '添加失败',
+        result: false,
+        count: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '添加失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
+// 添加次级管理员
+router.post('/admin/addadmin', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    let _sql = 'INSERT INTO admin (admin,password,nickName,level,regDate,imgUrl) VALUES (?,?,?,?,?,?)'
+    // level 为2为次级管理员 因为超级管理员只能插入次级管理员
+    let _value = [_info.admin, _info.password, _info.nickName, 2, _info.regDate, _info.imgUrl]
+    let _data = await poolSql(_sql, _value)
     if (_data.affectedRows === 1) {
       ctx.body = {
         code: 200,
@@ -137,6 +185,28 @@ router.post('/admin/edituser', async ctx => {
       errorMessage: '修改用户信息失败',
       result: false,
       count: null
+    }
+  }
+})
+
+// 根据id获取用户信息
+router.get('/admin/getuserbyid', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT * FROM user WHERE id=?'
+    let _value = [_info.id]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      user: _data[0]
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询用户详情失败',
+      result: false,
+      user: null
     }
   }
 })
