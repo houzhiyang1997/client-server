@@ -185,6 +185,8 @@ router.get('/admin/getadminbyid', async ctx => {
     let _sql = 'SELECT * FROM admin WHERE id=?'
     let _value = [_info.id]
     let _data = await poolSql(_sql, _value)
+    //将管理员级别进行映射处理
+    _data[0].level = _data[0].level === 1 ? '超级管理员' : '次级管理员'
     ctx.body = {
       errorMessage: '',
       result: true,
@@ -195,6 +197,40 @@ router.get('/admin/getadminbyid', async ctx => {
       errorMessage: '查询管理员详情失败',
       result: false,
       admin: null
+    }
+  }
+})
+
+// 根据id 修改管理员信息
+router.post('/admin/editadmin', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    let _sql = 'UPDATE admin SET password=?,nickName=?,regDate=?,imgUrl=? WHERE id=?'
+    let _value = [_info.password, _info.nickName, _info.regDate, _info.imgUrl, _info.id]
+    let _data = await poolSql(_sql, _value)
+    if (_data.affectedRows === 1) {
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        count: _data.affectedRows
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '修改管理员信息失败',
+        result: false,
+        count: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '修改管理员信息失败',
+      result: false,
+      count: null
     }
   }
 })
