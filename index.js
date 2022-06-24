@@ -484,6 +484,77 @@ router.post('/admin/editadmin', async ctx => {
   }
 })
 
+// 根据id 修改 英雄棋子 信息
+router.post('/admin/editchess', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    let _sql =
+      'UPDATE chess SET chessId=?,TFTID=?,title=?,displayName=?,name=?,raceIds=?,races=?,jobIds=?,jobs=?,price=?,skillName=?,' +
+      'skillType=?,skillImage=?,skillDetail=?,life=?,magic=?,startMagic=?,armor=?,spellBlock=?,attack=?,attackSpeed=?,' +
+      'attackRange=?,recEquip=?,attackData=?,lifeData=?,version=?,season=? WHERE id=?'
+
+    // 将某些羁绊，职业，推荐装备的数组处理为字符串
+    let _v_races = _info.races.join(',')
+    let _v_jobs = _info.jobs.join(',')
+    let _v_recEquip = _info.recEquip.join(',')
+    let _value = [
+      _info.chessId,
+      _info.TFTID,
+      _info.title,
+      _info.displayName,
+      _info.name,
+      _info.raceIds,
+      _v_races,
+      _info.jobIds,
+      _v_jobs,
+      _info.price,
+      _info.skillName,
+      _info.skillType,
+      _info.skillImage,
+      _info.skillDetail,
+      _info.life,
+      _info.magic,
+      _info.startMagic,
+      _info.armor,
+      _info.spellBlock,
+      _info.attack,
+      _info.attackSpeed,
+      _info.attackRange,
+      _v_recEquip,
+      _info.attackData,
+      _info.lifeData,
+      _info.version,
+      _info.season,
+      _info.id
+    ]
+    let _data = await poolSql(_sql, _value)
+    if (_data.affectedRows === 1) {
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        count: _data.affectedRows
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '修改英雄棋子信息失败',
+        result: false,
+        count: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '修改英雄棋子信息失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
 // 根据id删除用户信息
 router.get('/admin/deleteuser', async ctx => {
   ctx.status = 200
