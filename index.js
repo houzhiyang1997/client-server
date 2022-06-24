@@ -736,6 +736,54 @@ router.post('/admin/editchess', async ctx => {
   }
 })
 
+// 根据id 修改 装备 信息
+router.post('/admin/editequip', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    let _sql =
+      'UPDATE equipment SET equipId=?,type=?,name=?,effect=?,keywords=?,formula=?,imagePath=?,version=?,season=? WHERE id=?'
+    // 将装备的数组处理为字符串
+    let _v_formula = _info.formula.join(',')
+    let _value = [
+      _info.equipId,
+      _info.type,
+      _info.name,
+      _info.effect,
+      _info.keywords,
+      _v_formula,
+      _info.imagePath,
+      _info.version,
+      _info.season,
+      _info.id
+    ]
+    let _data = await poolSql(_sql, _value)
+    if (_data.affectedRows === 1) {
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        count: _data.affectedRows
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '修改装备信息失败',
+        result: false,
+        count: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '修改装备信息失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
 // 根据id删除用户信息
 router.get('/admin/deleteuser', async ctx => {
   ctx.status = 200
