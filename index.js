@@ -370,6 +370,53 @@ router.post('/admin/addchess', async ctx => {
   }
 })
 
+// 添加新装备
+router.post('/admin/addequip', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    let _sql =
+      'INSERT INTO equipment (equipId,type,name,effect,keywords,formula,imagePath,version,season) VALUES (?,?,?,?,?,?,?,?,?)'
+    // 将某些formula的数组处理为字符串
+    let _v_formula = _info.formula.join(',')
+    let _value = [
+      _info.equipId,
+      _info.type,
+      _info.name,
+      _info.effect,
+      _info.keywords,
+      _v_formula,
+      _info.imagePath,
+      _info.version,
+      _info.season
+    ]
+    let _data = await poolSql(_sql, _value)
+    if (_data.affectedRows === 1) {
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        count: _data.affectedRows
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '添加失败',
+        result: false,
+        count: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '添加失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
 // 根据id 获取用户信息
 router.get('/admin/getuserbyid', async ctx => {
   ctx.status = 200
