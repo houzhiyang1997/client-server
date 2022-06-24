@@ -597,6 +597,28 @@ router.get('/admin/getequipbyid', async ctx => {
   }
 })
 
+// 根据id 获取 海克斯 信息
+router.get('/admin/gethexbyid', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT * FROM hex WHERE id=?'
+    let _value = [_info.id]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      hex: _data[0]
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询海克斯详情失败',
+      result: false,
+      hex: null
+    }
+  }
+})
+
 // 根据id 修改用户信息
 router.post('/admin/edituser', async ctx => {
   ctx.status = 200
@@ -753,6 +775,49 @@ router.post('/admin/editequip', async ctx => {
       _info.keywords,
       _v_formula,
       _info.imagePath,
+      _info.version,
+      _info.season,
+      _info.id
+    ]
+    let _data = await poolSql(_sql, _value)
+    if (_data.affectedRows === 1) {
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        count: _data.affectedRows
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '修改装备信息失败',
+        result: false,
+        count: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '修改装备信息失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
+// 根据id 修改 hex 信息
+router.post('/admin/edithex', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    let _sql = 'UPDATE hex SET hexId=?,type=?,name=?,imgUrl=?,description=?,version=?,season=? WHERE id=?'
+    let _value = [
+      _info.hexId,
+      _info.type,
+      _info.name,
+      _info.imgUrl,
+      _info.description,
       _info.version,
       _info.season,
       _info.id
