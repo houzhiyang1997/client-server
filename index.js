@@ -208,7 +208,62 @@ router.get('/admin/getequips', async ctx => {
   }
 })
 
-// 获取 散件装备列表 取值为一个区间)
+// 获取 hex 列表，带分页 和分等级
+router.get('/admin/gethexes', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    // 先看是否有等级查询条件
+    let query = ''
+    let _value_total = []
+    // 分页查询 注意需要两个数字类型
+    let offset = (Number(_info.pageNum) - 1) * Number(_info.pageSize)
+    let _value_query = []
+    if (_info.hexLevel === 'all') {
+      //查询所有则不区分type
+      query = 'season=?'
+      _value_total = [_info.selectContent, _info.searchContent, _info.searchContent]
+      _value_query = [_info.selectContent, _info.searchContent, _info.searchContent, Number(_info.pageSize), offset]
+    } else {
+      query = '(type=? AND season=?)'
+      _value_total = [parseInt(_info.hexLevel), _info.selectContent, _info.searchContent, _info.searchContent]
+      _value_query = [
+        parseInt(_info.hexLevel),
+        _info.selectContent,
+        _info.searchContent,
+        _info.searchContent,
+        Number(_info.pageSize),
+        offset
+      ]
+    }
+    //先查询总数
+    let _sql_total =
+      'SELECT count(id) as total FROM hex WHERE ' +
+      query +
+      ' AND (name LIKE CONCAT("%",?,"%") OR description LIKE CONCAT("%",?,"%"))'
+    let _total = await poolSql(_sql_total, _value_total)
+    let _sql_data =
+      'SELECT * FROM hex WHERE ' +
+      query +
+      ' AND (name LIKE CONCAT("%",?,"%") OR description LIKE CONCAT("%",?,"%")) limit ? offset ?'
+    let _data = await poolSql(_sql_data, _value_query)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      hexes: _data,
+      total: _total[0].total
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询海克斯列表失败',
+      result: false,
+      hexes: null,
+      total: null
+    }
+  }
+})
+
+// 获取 散件装备 列表 取值为一个区间)
 router.get('/admin/getformula', async ctx => {
   ctx.status = 200
   const _info = ctx.query
