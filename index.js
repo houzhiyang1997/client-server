@@ -394,6 +394,28 @@ router.get('/admin/getadminbyid', async ctx => {
   }
 })
 
+// 根据id 获取 英雄棋子 信息
+router.get('/admin/getchessbyid', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT * FROM chess WHERE id=?'
+    let _value = [_info.id]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      chess: _data[0]
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询英雄棋子详情失败',
+      result: false,
+      chess: null
+    }
+  }
+})
+
 // 根据id 修改用户信息
 router.post('/admin/edituser', async ctx => {
   ctx.status = 200
