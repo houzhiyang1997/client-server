@@ -208,6 +208,28 @@ router.get('/admin/getequips', async ctx => {
   }
 })
 
+// 获取 散件装备列表 取值为一个区间)
+router.get('/admin/getformula', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT * FROM equipment WHERE season=? and (equipId>=501 and equipId<=509)'
+    let _value = [_info.season]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      formula: _data
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询散件装备失败',
+      result: false,
+      formula: null
+    }
+  }
+})
+
 // 添加用户
 router.post('/admin/adduser', async ctx => {
   ctx.status = 200
