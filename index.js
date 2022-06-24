@@ -485,6 +485,28 @@ router.get('/admin/getchessbyid', async ctx => {
   }
 })
 
+// 根据id 获取 装备 信息
+router.get('/admin/getequipbyid', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT * FROM equipment WHERE id=?'
+    let _value = [_info.id]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      equip: _data[0]
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询装备详情失败',
+      result: false,
+      equip: null
+    }
+  }
+})
+
 // 根据id 修改用户信息
 router.post('/admin/edituser', async ctx => {
   ctx.status = 200
