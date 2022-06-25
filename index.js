@@ -542,6 +542,41 @@ router.post('/admin/addrace', async ctx => {
   }
 })
 
+// 添加新职业
+router.post('/admin/addjob', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    let _sql = 'INSERT INTO job (jobId,name,introduce,level,imagePath,version,season) VALUES (?,?,?,?,?,?,?)'
+    // 将某些formula的数组处理为字符串
+    let _value = [_info.jobId, _info.name, _info.introduce, _info.level, _info.imagePath, _info.version, _info.season]
+    let _data = await poolSql(_sql, _value)
+    if (_data.affectedRows === 1) {
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        count: _data.affectedRows
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '添加失败',
+        result: false,
+        count: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '添加失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
 // 根据id 获取用户信息
 router.get('/admin/getuserbyid', async ctx => {
   ctx.status = 200
