@@ -263,6 +263,67 @@ router.get('/admin/gethexes', async ctx => {
   }
 })
 
+// 获取 小小英雄 列表，带分页、分星级、分品质
+router.get('/admin/getheros', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    // 先看是否有星级和品质查询条件
+    let query = ''
+    let _value_total = []
+    // 分页查询 注意需要两个数字类型
+    let offset = (Number(_info.pageNum) - 1) * Number(_info.pageSize)
+    let _value_query = []
+    if (_info.qualityContent === 'all' && _info.starContent === 'all') {
+      //查询所有则不区分type
+      query = ''
+      _value_total = [_info.searchContent]
+      _value_query = [_info.searchContent, Number(_info.pageSize), offset]
+    } else if (_info.qualityContent === 'all' && _info.starContent !== 'all') {
+      // 品质为全部 星级有条件
+      query = 'star=? AND '
+      _value_total = [parseInt(_info.starContent), _info.searchContent]
+      _value_query = [parseInt(_info.starContent), _info.searchContent, Number(_info.pageSize), offset]
+    } else if (_info.qualityContent !== 'all' && _info.starContent === 'all') {
+      // 品质有条件 星级为全部
+      query = 'quality=? AND '
+      _value_total = [_info.qualityContent, _info.searchContent]
+      _value_query = [_info.qualityContent, _info.searchContent, Number(_info.pageSize), offset]
+    } else {
+      // 都有条件
+      query = '(quality=? AND star=?) AND '
+      _value_total = [_info.qualityContent, parseInt(_info.starContent), _info.searchContent]
+      _value_query = [
+        _info.qualityContent,
+        parseInt(_info.starContent),
+        _info.searchContent,
+        Number(_info.pageSize),
+        offset
+      ]
+    }
+    //先查询总数
+    let _sql_total = 'SELECT count(id) as total FROM hero WHERE ' + query + '(name LIKE CONCAT("%",?,"%"))'
+    console.log('total:' + _sql_total)
+    let _total = await poolSql(_sql_total, _value_total)
+    let _sql_data = 'SELECT * FROM hero WHERE ' + query + '(name LIKE CONCAT("%",?,"%")) limit ? offset ?'
+    // console.log('data:' + _sql_data)
+    let _data = await poolSql(_sql_data, _value_query)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      heros: _data,
+      total: _total[0].total
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询小小英雄列表失败',
+      result: false,
+      heros: null,
+      total: null
+    }
+  }
+})
+
 // 获取 散件装备 列表 取值为一个区间)
 router.get('/admin/getformula', async ctx => {
   ctx.status = 200
