@@ -654,6 +654,28 @@ router.get('/admin/gethexbyid', async ctx => {
   }
 })
 
+// 根据id 获取 种族race 信息
+router.get('/admin/getracebyid', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT * FROM race WHERE id=?'
+    let _value = [_info.id]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      hex: _data[0]
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询种族详情失败',
+      result: false,
+      hex: null
+    }
+  }
+})
+
 // 根据id 修改用户信息
 router.post('/admin/edituser', async ctx => {
   ctx.status = 200
