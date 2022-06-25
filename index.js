@@ -665,13 +665,13 @@ router.get('/admin/getracebyid', async ctx => {
     ctx.body = {
       errorMessage: '',
       result: true,
-      hex: _data[0]
+      race: _data[0]
     }
   } catch (error) {
     ctx.body = {
       errorMessage: '查询种族详情失败',
       result: false,
-      hex: null
+      race: null
     }
   }
 })
@@ -890,7 +890,7 @@ router.post('/admin/edithex', async ctx => {
     } else {
       ctx.body = {
         code: 401,
-        errorMessage: '修改装备信息失败',
+        errorMessage: '修改hex信息失败',
         result: false,
         count: null
       }
@@ -899,7 +899,50 @@ router.post('/admin/edithex', async ctx => {
   } catch (error) {
     ctx.body = {
       code: 402,
-      errorMessage: '修改装备信息失败',
+      errorMessage: '修改hex信息失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
+// 根据id 修改 种族race 信息
+router.post('/admin/editrace', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    let _sql = 'UPDATE race SET raceId=?,name=?,introduce=?,level=?,imagePath=?,version=?,season=? WHERE id=?'
+    let _value = [
+      _info.raceId,
+      _info.name,
+      _info.introduce,
+      _info.level,
+      _info.imagePath,
+      _info.version,
+      _info.season,
+      _info.id
+    ]
+    let _data = await poolSql(_sql, _value)
+    if (_data.affectedRows === 1) {
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        count: _data.affectedRows
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '修改种族信息失败',
+        result: false,
+        count: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '修改种族信息失败',
       result: false,
       count: null
     }
