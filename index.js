@@ -303,10 +303,8 @@ router.get('/admin/getheros', async ctx => {
     }
     //先查询总数
     let _sql_total = 'SELECT count(id) as total FROM hero WHERE ' + query + '(name LIKE CONCAT("%",?,"%"))'
-    console.log('total:' + _sql_total)
     let _total = await poolSql(_sql_total, _value_total)
     let _sql_data = 'SELECT * FROM hero WHERE ' + query + '(name LIKE CONCAT("%",?,"%")) limit ? offset ?'
-    // console.log('data:' + _sql_data)
     let _data = await poolSql(_sql_data, _value_query)
     ctx.body = {
       errorMessage: '',
@@ -611,6 +609,52 @@ router.post('/admin/addjob', async ctx => {
     let _sql = 'INSERT INTO jobs (jobId,name,introduce,level,imagePath,version,season) VALUES (?,?,?,?,?,?,?)'
     // 将某些formula的数组处理为字符串
     let _value = [_info.jobId, _info.name, _info.introduce, _info.level, _info.imagePath, _info.version, _info.season]
+    let _data = await poolSql(_sql, _value)
+    if (_data.affectedRows === 1) {
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        count: _data.affectedRows
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '添加失败',
+        result: false,
+        count: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '添加失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
+// 添加新小小英雄
+router.post('/admin/addhero', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    let _sql =
+      'INSERT INTO hero (heroId,name,typeId,type,miniId,mini,star,imagePath,quality,shape) VALUES (?,?,?,?,?,?,?,?,?,?)'
+    let _value = [
+      _info.heroId,
+      _info.name,
+      _info.typeId,
+      _info.type,
+      _info.miniId,
+      _info.mini,
+      _info.star,
+      _info.imagePath,
+      _info.quality,
+      _info.shape
+    ]
     let _data = await poolSql(_sql, _value)
     if (_data.affectedRows === 1) {
       ctx.body = {
