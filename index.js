@@ -838,6 +838,28 @@ router.get('/admin/getjobbyid', async ctx => {
   }
 })
 
+// 根据id 获取 小小英雄hero 信息
+router.get('/admin/getherobyid', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT * FROM hero WHERE id=?'
+    let _value = [_info.id]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      job: _data[0]
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询小小英雄hero详情失败',
+      result: false,
+      job: null
+    }
+  }
+})
+
 // 根据id 修改用户信息
 router.post('/admin/edituser', async ctx => {
   ctx.status = 200
