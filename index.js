@@ -1181,6 +1181,28 @@ router.get('/admin/deleterace', async ctx => {
   }
 })
 
+// 根据id删除 job 信息
+router.get('/admin/deletejob', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'DELETE FROM jobs WHERE id=?'
+    let _value = [_info.id]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      count: _data.affectedRows
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '删除job失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
 /* 
 
 
