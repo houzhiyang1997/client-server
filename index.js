@@ -849,13 +849,13 @@ router.get('/admin/getherobyid', async ctx => {
     ctx.body = {
       errorMessage: '',
       result: true,
-      job: _data[0]
+      hero: _data[0]
     }
   } catch (error) {
     ctx.body = {
       errorMessage: '查询小小英雄hero详情失败',
       result: false,
-      job: null
+      hero: null
     }
   }
 })
@@ -1170,6 +1170,53 @@ router.post('/admin/editjob', async ctx => {
     ctx.body = {
       code: 402,
       errorMessage: '修改职业信息失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
+// 根据id 修改 小小英雄hero 信息
+router.post('/admin/editjob', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    let _sql =
+      'UPDATE jobs SET heroId=?,name=?,typeId=?,type=?,miniId=?,mini=?,star=?,imagePath=?,quality=?,shape=? WHERE id=?'
+    let _value = [
+      _info.heroId,
+      _info.name,
+      _info.typeId,
+      _info.type,
+      _info.miniId,
+      _info.mini,
+      _info.star,
+      _info.imagePath,
+      _info.quality,
+      _info.shape,
+      _info.id
+    ]
+    let _data = await poolSql(_sql, _value)
+    if (_data.affectedRows === 1) {
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        count: _data.affectedRows
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '修改小小英雄hero信息失败',
+        result: false,
+        count: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '修改小小英雄hero信息失败',
       result: false,
       count: null
     }
