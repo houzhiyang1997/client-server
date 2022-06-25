@@ -547,7 +547,7 @@ router.post('/admin/addjob', async ctx => {
   ctx.status = 200
   let _info = ctx.request.body
   try {
-    let _sql = 'INSERT INTO job (jobId,name,introduce,level,imagePath,version,season) VALUES (?,?,?,?,?,?,?)'
+    let _sql = 'INSERT INTO jobs (jobId,name,introduce,level,imagePath,version,season) VALUES (?,?,?,?,?,?,?)'
     // 将某些formula的数组处理为字符串
     let _value = [_info.jobId, _info.name, _info.introduce, _info.level, _info.imagePath, _info.version, _info.season]
     let _data = await poolSql(_sql, _value)
@@ -707,6 +707,28 @@ router.get('/admin/getracebyid', async ctx => {
       errorMessage: '查询种族详情失败',
       result: false,
       race: null
+    }
+  }
+})
+
+// 根据id 获取 职业job 信息
+router.get('/admin/getjobbyid', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT * FROM jobs WHERE id=?'
+    let _value = [_info.id]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      job: _data[0]
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询职业详情失败',
+      result: false,
+      job: null
     }
   }
 })
@@ -978,6 +1000,49 @@ router.post('/admin/editrace', async ctx => {
     ctx.body = {
       code: 402,
       errorMessage: '修改种族信息失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
+// 根据id 修改 职业job 信息
+router.post('/admin/editjob', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    let _sql = 'UPDATE jobs SET jobId=?,name=?,introduce=?,level=?,imagePath=?,version=?,season=? WHERE id=?'
+    let _value = [
+      _info.jobId,
+      _info.name,
+      _info.introduce,
+      _info.level,
+      _info.imagePath,
+      _info.version,
+      _info.season,
+      _info.id
+    ]
+    let _data = await poolSql(_sql, _value)
+    if (_data.affectedRows === 1) {
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        count: _data.affectedRows
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '修改职业信息失败',
+        result: false,
+        count: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '修改职业信息失败',
       result: false,
       count: null
     }
