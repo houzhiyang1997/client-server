@@ -737,6 +737,68 @@ router.post('/admin/addhero', async ctx => {
   }
 })
 
+// 添加新阵容
+router.post('/admin/addteam', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    let _sql =
+      'INSERT INTO team (teamId,title,author,chessList,imgList,goods,hard,authorImg,label,steadyContent,' +
+      'hexList,chessPosition,equipOrder,carryChess,otherChess,equipContent,positionContent,searchTime,counterRelation,' +
+      'version,season) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+    // 将棋子，海克斯，装备的数组处理为字符串
+    let _v_chesses = _info.chessList.join(',')
+    let _v_hexes = _info.hexList.join(',')
+    let _v_equips = _info.equipOrder.join(',')
+    let _value = [
+      _info.teamId,
+      _info.title,
+      _info.author,
+      _v_chesses,
+      _info.imgList,
+      _info.goods,
+      _info.hard,
+      _info.label,
+      _info.steadyContent,
+      _v_hexes,
+      _info.chessPosition,
+      _v_equips,
+      _info.carryChess,
+      _info.otherChess,
+      _info.equipContent,
+      _info.positionContent,
+      _info.searchTime,
+      _info.counterRelation,
+      _info.version,
+      _info.season
+    ]
+    let _data = await poolSql(_sql, _value)
+    if (_data.affectedRows === 1) {
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        count: _data.affectedRows
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '添加失败',
+        result: false,
+        count: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '添加失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
 // 根据id 获取用户信息
 router.get('/admin/getuserbyid', async ctx => {
   ctx.status = 200
