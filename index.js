@@ -989,13 +989,13 @@ router.get('/admin/getteambyid', async ctx => {
     ctx.body = {
       errorMessage: '',
       result: true,
-      hero: _data[0]
+      team: _data[0]
     }
   } catch (error) {
     ctx.body = {
       errorMessage: '查询阵容team详情失败',
       result: false,
-      hero: null
+      team: null
     }
   }
 })
@@ -1348,6 +1348,70 @@ router.post('/admin/edithero', async ctx => {
       ctx.body = {
         code: 401,
         errorMessage: '修改小小英雄hero信息失败',
+        result: false,
+        count: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '修改小小英雄hero信息失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
+// 根据id 修改 阵容team 信息
+router.post('/admin/editteam', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    let _sql =
+      'UPDATE team SET teamId=?,title=?,author=?,chessList=?,imgList=?,goods=?,hard=?,authorImg=?,label=?,steadyContent=?,' +
+      'hexList=?,chessPosition=?,equipOrder=?,carryChess=?,otherChess=?,equipContent=?,positionContent=?,searchTime=?,counterRelation=?,' +
+      'version=?,season=? WHERE id=?'
+    // 将棋子，海克斯，装备的数组处理为字符串
+    let _v_chesses = _info.chessList.join(',')
+    let _v_hexes = _info.hexList.join(',')
+    let _v_equips = _info.equipOrder.join(',')
+    let _value = [
+      _info.teamId,
+      _info.title,
+      _info.author,
+      _v_chesses,
+      _info.imgList,
+      _info.goods,
+      _info.hard,
+      _info.authorImg,
+      _info.label,
+      _info.steadyContent,
+      _v_hexes,
+      _info.chessPosition,
+      _v_equips,
+      _info.carryChess,
+      _info.otherChess,
+      _info.equipContent,
+      _info.positionContent,
+      _info.searchTime,
+      _info.counterRelation,
+      _info.version,
+      _info.season,
+      _info.id
+    ]
+    let _data = await poolSql(_sql, _value)
+    if (_data.affectedRows === 1) {
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        count: _data.affectedRows
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '修改阵容team信息失败',
         result: false,
         count: null
       }
