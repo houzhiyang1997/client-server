@@ -758,13 +758,14 @@ router.post('/admin/addteam', async ctx => {
       _info.imgList,
       _info.goods,
       _info.hard,
+      _info.authorImg,
       _info.label,
       _info.steadyContent,
       _v_hexes,
       _info.chessPosition,
       _v_equips,
-      _info.carryChess,
-      _info.otherChess,
+      _info.carryChess.toString(),
+      _info.otherChess.toString(),
       _info.equipContent,
       _info.positionContent,
       _info.searchTime,
@@ -971,6 +972,28 @@ router.get('/admin/getherobyid', async ctx => {
   } catch (error) {
     ctx.body = {
       errorMessage: '查询小小英雄hero详情失败',
+      result: false,
+      hero: null
+    }
+  }
+})
+
+// 根据id 获取 阵容team 信息
+router.get('/admin/getteambyid', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT * FROM team WHERE id=?'
+    let _value = [_info.id]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      hero: _data[0]
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询阵容team详情失败',
       result: false,
       hero: null
     }
