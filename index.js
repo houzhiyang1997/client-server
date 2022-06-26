@@ -322,44 +322,56 @@ router.get('/admin/getheros', async ctx => {
   }
 })
 
-// 获取阵容team列表，带分页
+// 获取阵容team列表，带分页 和推荐
 router.get('/admin/getteams', async ctx => {
   ctx.status = 200
   const _info = ctx.query
   try {
-    //先查询总数
-    let _sql_total =
-      'SELECT count(id) as total FROM team WHERE (season=? AND label=?) AND (title LIKE CONCAT("%",?,"%") OR author LIKE CONCAT("%",?,"%"))'
-    let _total = await poolSql(_sql_total, [
-      _info.selectContent,
-      _info.labelContent,
-      _info.searchContent,
-      _info.searchContent
-    ])
+    // 先看是否有推荐查询条件
+    let query = ''
+    let _value_total = []
     // 分页查询 注意需要两个数字类型
     let offset = (Number(_info.pageNum) - 1) * Number(_info.pageSize)
-    let _value = [
-      _info.selectContent,
-      _info.labelContent,
-      _info.searchContent,
-      _info.searchContent,
-      Number(_info.pageSize),
-      offset
-    ]
+    let _value_query = []
+    if (_info.labelContent === 'all') {
+      //查询所有则不区分type
+      query = 'season=?'
+      _value_total = [_info.selectContent, _info.searchContent, _info.searchContent]
+      _value_query = [_info.selectContent, _info.searchContent, _info.searchContent, Number(_info.pageSize), offset]
+    } else {
+      query = '(label=? AND season=?)'
+      _value_total = [_info.labelContent, _info.selectContent, _info.searchContent, _info.searchContent]
+      _value_query = [
+        _info.labelContent,
+        _info.selectContent,
+        _info.searchContent,
+        _info.searchContent,
+        Number(_info.pageSize),
+        offset
+      ]
+    }
+    //先查询总数
+    let _sql_total =
+      'SELECT count(id) as total FROM team WHERE ' +
+      query +
+      ' AND (title LIKE CONCAT("%",?,"%") OR author LIKE CONCAT("%",?,"%"))'
+    let _total = await poolSql(_sql_total, _value_total)
     let _sql_data =
-      'SELECT * FROM team WHERE (season=? AND label=?) AND (title LIKE CONCAT("%",?,"%") OR displauthorayName LIKE CONCAT("%",?,"%")) limit ? offset ?'
-    let _data = await poolSql(_sql_data, _value)
+      'SELECT * FROM team WHERE ' +
+      query +
+      ' AND (title LIKE CONCAT("%",?,"%") OR author LIKE CONCAT("%",?,"%")) limit ? offset ?'
+    let _data = await poolSql(_sql_data, _value_query)
     ctx.body = {
       errorMessage: '',
       result: true,
-      chesses: _data,
+      teams: _data,
       total: _total[0].total
     }
   } catch (error) {
     ctx.body = {
       errorMessage: '查询阵容列表失败',
       result: false,
-      chesses: null,
+      teams: null,
       total: null
     }
   }
