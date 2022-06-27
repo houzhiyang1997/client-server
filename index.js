@@ -1069,6 +1069,28 @@ router.get('/admin/getteambyid', async ctx => {
   }
 })
 
+// 根据id 获取新闻信息
+router.get('/admin/getnewsbyid', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT * FROM news WHERE id=?'
+    let _value = [_info.id]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      user: _data[0]
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询新闻详情失败',
+      result: false,
+      user: null
+    }
+  }
+})
+
 // 根据id 修改用户信息
 router.post('/admin/edituser', async ctx => {
   ctx.status = 200
