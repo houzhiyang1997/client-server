@@ -377,6 +377,37 @@ router.get('/admin/getteams', async ctx => {
   }
 })
 
+// 获取新闻列表，带分页
+router.get('/admin/getnews', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    //先查询总数
+    let _sql_total =
+      'SELECT count(id) as total FROM news WHERE (title LIKE CONCAT("%",?,"%") OR author LIKE CONCAT("%",?,"%"))'
+    let _total = await poolSql(_sql_total, [_info.searchContent, _info.searchContent])
+    // 分页查询 注意需要两个数字类型
+    let offset = (Number(_info.pageNum) - 1) * Number(_info.pageSize)
+    let _value = [_info.searchContent, _info.searchContent, Number(_info.pageSize), offset]
+    let _sql_data =
+      'SELECT * FROM news WHERE (title LIKE CONCAT("%",?,"%") OR author LIKE CONCAT("%",?,"%")) limit ? offset ?'
+    let _data = await poolSql(_sql_data, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      news: _data,
+      total: _total[0].total
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '查询新闻列表失败',
+      result: false,
+      news: null,
+      total: null
+    }
+  }
+})
+
 // 获取 散件装备 列表 取值为一个区间)
 router.get('/admin/getformula', async ctx => {
   ctx.status = 200
