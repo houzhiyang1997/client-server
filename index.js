@@ -1080,13 +1080,13 @@ router.get('/admin/getnewsbyid', async ctx => {
     ctx.body = {
       errorMessage: '',
       result: true,
-      user: _data[0]
+      news: _data[0]
     }
   } catch (error) {
     ctx.body = {
       errorMessage: '查询新闻详情失败',
       result: false,
-      user: null
+      news: null
     }
   }
 })
@@ -1503,6 +1503,45 @@ router.post('/admin/editteam', async ctx => {
       ctx.body = {
         code: 401,
         errorMessage: '修改阵容team信息失败',
+        result: false,
+        count: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '修改小小英雄hero信息失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
+// 根据id 修改 新闻news 信息
+router.post('/admin/editnews', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    let _sql = 'UPDATE news SET newsId=?,title=?,author=?,content=?,img=?,author_img=? WHERE id=?'
+    // 将棋子，海克斯，装备的数组处理为字符串
+    // 对content进行包装 加上p标签
+    let content = _info.content.split('\n')
+    content = content.map(item => '<p>' + item + '</p>')
+    const _v_content = content.join('')
+    let _value = [_info.newsId, _info.title, _info.author, _v_content, _info.img, _info.author_img, _info.id]
+    let _data = await poolSql(_sql, _value)
+    if (_data.affectedRows === 1) {
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        count: _data.affectedRows
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '修改新闻信息失败',
         result: false,
         count: null
       }
