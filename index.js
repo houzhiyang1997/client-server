@@ -831,6 +831,44 @@ router.post('/admin/addteam', async ctx => {
   }
 })
 
+// 添加新闻
+router.post('/admin/addnews', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    let _sql = 'INSERT INTO news (newsId,title,author,content,img,author_img) VALUES (?,?,?,?,?,?)'
+    // 对content进行包装 加上p标签
+    let content = _info.content.split('\n')
+    content = content.map(item => '<p>' + item + '</p>')
+    const _v_content = content.join('')
+    let _value = [_info.newsId, _info.title, _info.author, _v_content, _info.img, _info.author_img]
+    let _data = await poolSql(_sql, _value)
+    if (_data.affectedRows === 1) {
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        count: _data.affectedRows
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '添加失败',
+        result: false,
+        count: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '添加失败',
+      result: false,
+      count: null
+    }
+  }
+})
+
 // 根据id 获取用户信息
 router.get('/admin/getuserbyid', async ctx => {
   ctx.status = 200
