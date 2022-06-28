@@ -18,6 +18,73 @@ router.get('/index', async ctx => {
   ctx.body = '这是index'
 })
 
+// 后台登录接口
+router.post('/admin/login', async ctx => {
+  ctx.status = 200
+  let _info = ctx.request.body
+  try {
+    // 生成token
+    const _token = Date.now()
+    // 更新数据库
+    let _sql_token = 'UPDATE admin SET token=? WHERE admin=?'
+    let _value_token = [_token, _info.username]
+    let _data_token = await poolSql(_sql_token, _value_token)
+
+    let _sql = 'SELECT * FROM admin where admin=?'
+    let _username = [_info.username]
+    let _data = await poolSql(_sql, _username)
+
+    if (_info.password === _data[0].password) {
+      // 密码置位空，不发送前台
+      _data[0].password = ''
+      ctx.body = {
+        code: 200,
+        errorMessage: '',
+        result: true,
+        data: _data[0],
+        token: _token
+      }
+    } else {
+      ctx.body = {
+        code: 401,
+        errorMessage: '用户名或密码错误',
+        result: false,
+        data: null
+      }
+      return
+    }
+  } catch (error) {
+    ctx.body = {
+      code: 402,
+      errorMessage: '登录失败',
+      result: false,
+      data: null
+    }
+  }
+})
+
+// 获取用户token
+router.get('/admin/gettoken', async ctx => {
+  ctx.status = 200
+  const _info = ctx.query
+  try {
+    let _sql = 'SELECT token FROM admin WHERE admin=? '
+    let _value = [_info.username]
+    let _data = await poolSql(_sql, _value)
+    ctx.body = {
+      errorMessage: '',
+      result: true,
+      token: _data[0].token
+    }
+  } catch (error) {
+    ctx.body = {
+      errorMessage: '获取token失败',
+      result: false,
+      token: null
+    }
+  }
+})
+
 // 获取用户列表，带分页
 router.get('/admin/getusers', async ctx => {
   ctx.status = 200
